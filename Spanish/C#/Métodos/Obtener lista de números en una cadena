@@ -1,0 +1,72 @@
+/// <summary>
+/// Obtiene los números contenidos en una cadena y los devuelve en una lista de decimales.
+/// </summary>
+/// <returns>Lista de decimales encontrados.</returns>
+
+public static List<decimal> ObtenerNumerosDeCadena(string texto, bool siCadenaEstaVaciaReemplazarPorCero = false)
+{
+    if (siCadenaEstaVaciaReemplazarPorCero && texto.Trim().Equals(""))
+        texto = "0";
+    
+    List<decimal> numerosEncontrados = new List<decimal>();
+
+    if (texto.Any(char.IsDigit))
+    {
+        texto = texto.Replace(" ", "");
+        List<char> digitosNumeroActual = new List<char>();
+        int contador = 0,
+        numeroCaracteres = texto.Length + 1;
+        char caracterActual;
+        bool leyendoNumero = false,
+            esNegativo = false;
+
+        while (contador < numeroCaracteres)
+        {
+            if (contador == numeroCaracteres - 1)
+                caracterActual = ' ';
+            else
+                caracterActual = texto[contador];
+
+            if (int.TryParse(caracterActual + "", out _) || (leyendoNumero && caracterActual.Equals(',')) || caracterActual.Equals('.') || (caracterActual.Equals('-') && leyendoNumero == false && int.TryParse(texto[contador + 1] + "", out _)))
+            {
+                leyendoNumero = true;
+
+                if (caracterActual.Equals('-') || (contador > 0 && texto[contador - 1].Equals('-')))
+                    esNegativo = true;
+
+                if (!caracterActual.Equals(',') && !caracterActual.Equals('-'))
+                    digitosNumeroActual.Add(caracterActual);
+            }
+            else
+            if (leyendoNumero)
+            {
+                leyendoNumero = false;
+
+                if (digitosNumeroActual.Count > 0)
+                {
+                    if (!(digitosNumeroActual[0].Equals('.') && digitosNumeroActual.Count == 1))
+                    {
+                        if (digitosNumeroActual[0].Equals('.'))
+                            digitosNumeroActual.Insert(0, '0');
+                        else
+                        if (digitosNumeroActual[digitosNumeroActual.Count - 1].Equals('.'))
+                            digitosNumeroActual.Add('0');
+
+                        if (digitosNumeroActual.All(item => int.TryParse(item + "", out _) || item.Equals('.')) && digitosNumeroActual.Count(item => item.Equals('.')) <= 1)
+                        {
+                            numerosEncontrados.Add(decimal.Parse((esNegativo ? "-" : "") + String.Join("", digitosNumeroActual.ToArray())));
+                        }
+                    }
+
+                    digitosNumeroActual.Clear();
+                }
+
+                esNegativo = false;
+            }
+
+            contador++;
+        }
+    }
+
+    return numerosEncontrados;
+}
