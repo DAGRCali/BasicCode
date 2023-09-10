@@ -1,0 +1,41 @@
+USE [nombreDeTuBaseDeDatos]
+GO
+/****** Object:  UserDefinedFunction [dbo].[RestarPorcentaje]    Script Date: 09/09/2023 10:06:51 p. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Autor:		    Daniel Alejandro Gutierrez Ruiz.
+-- Descripcion: Obtiene el valor menos el porcentaje especificado.
+-- Regresa:		  El resultado en decimal(38,19).
+-- =============================================
+ALTER FUNCTION [dbo].[FuncionObtenerCantidadMenosPorcentaje] 
+(
+	@valor DECIMAL(38, 19),
+	@porcentaje DECIMAL(38, 19),
+	@porcentajeEstaDivididoEntre100 BIT,
+  @dividirEntreUnoPuntoYPorcentaje BIT = 0
+)
+RETURNS DECIMAL(38, 19)
+AS
+BEGIN
+	DECLARE @resultado DECIMAL(38, 19)
+	
+	IF @porcentajeEstaDivididoEntre100 = 1
+  --Por ejemplo, si se desea restar 20%, puede que el valor del porcentaje sea 0.20. En este caso, multiplicamos por 100. 
+        SET @porcentaje *= 100;
+
+    IF @dividirEntreUnoPuntoYPorcentaje = 1
+    --Hay ocasiones que la resta se hace para volver a un valor inicial. Por ejemplo, 800 + 15% = 920. Si se desea restar ese porcentaje para volver al valor inicial, entonces hacemos lo siguiente: 920 / 1.15 = 800. Este cálculo es útil cuando se desea ver el precio de un producto antes de impuestos, por ejemplo.
+    BEGIN
+        SET @porcentaje /= 100;
+
+        SET @resultado = @valor / (1 + @porcentaje);
+    END
+    --Se hace una resta común. Por ejemplo, 920 - 15% = 782.
+    ELSE
+        SET @resultado = @valor - (@valor * @porcentaje / 100);
+
+	RETURN @resultado
+END
