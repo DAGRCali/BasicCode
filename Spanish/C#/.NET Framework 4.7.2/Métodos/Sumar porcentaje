@@ -1,0 +1,12 @@
+/// <summary>
+/// Obtiene el valor más el porcentaje especificado
+/// </summary>
+
+public static decimal SumarPorcentaje(decimal valor, decimal porcentaje, bool porcentajeEstaDivididoEntre100)
+{
+  if (!porcentajeEstaDivididoEntre100)
+  //Por ejemplo, si se desea sumar 20% y el valor del porcentaje efectivamente sea 20, entonces dividimos entre 100.
+    porcentaje /= 100;
+
+    return valor * (1 + porcentaje);
+}
