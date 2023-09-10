@@ -1,0 +1,28 @@
+/// <summary>
+/// Elimina los archivos que tengan esos días o más en el directorio.
+/// </summary>
+/// <remarks>
+/// Si se especifica la extensión, solo se eliminarán aquellos archivos con tal extensión.
+/// </remarks>
+public static void EliminarArchivosViejos(String directorio, int dias, string extension = "")
+{
+  try
+    {
+      if (Directory.Exists(directorio))
+        {
+          string[] files = Directory.GetFiles(directorio);
+
+          foreach (string file in files)
+          {
+            FileInfo fi = new FileInfo(file);
+
+            if (fi.CreationTime < DateTime.Now.AddDays(-dias) && (extension.Equals("") || fi.Extension.Equals(extension)))
+              fi.Delete();
+           }
+         }
+    }
+    catch (Exception ex)
+    {
+       MessageBox.Show("No se pudo eliminar un archivo que tiene " + dias + " días de antigüedad. Esto es un detalle menor. Cuando tenga oportunidad, contacte al desarrollador.", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+    }
+}
