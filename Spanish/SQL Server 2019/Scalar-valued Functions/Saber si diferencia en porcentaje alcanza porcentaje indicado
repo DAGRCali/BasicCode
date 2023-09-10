@@ -6,7 +6,6 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 -- =============================================
--- Autor:	Daniel Alejandro Gutierrez Ruiz.
 -- Descripcion:	Indica si la diferencia en porcentaje entre dos valores es igual o mayor a la diferencia en porcentaje indicada.
 -- Regresa:	Un booleano.
 -- =============================================
