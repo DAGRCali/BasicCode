@@ -1,3 +1,7 @@
+/// <summary>
+/// Obtiene el número de decimales después del punto. Por ejemplo, si recibe 3.14159, devolverá 5.
+/// </summary>
+
 public static int ObtenerNumeroDeDecimalesDespuesDelPunto(string numero)
 {
     numero = numero.Trim();
