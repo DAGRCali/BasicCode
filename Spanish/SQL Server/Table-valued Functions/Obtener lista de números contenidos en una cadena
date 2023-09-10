@@ -6,9 +6,9 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 -- =============================================
--- Autor:		Daniel Alejandro Gutierrez Ruiz.
+-- Autor:	Daniel Alejandro Gutierrez Ruiz.
 -- Descripcion:	Obtiene los números contenidos en una cadena y los devuelve en una lista de decimales.
--- Regresa:		Lista de decimales encontrados.
+-- Regresa:	Lista de decimales encontrados.
 -- =============================================
 CREATE FUNCTION [dbo].[FuncionObtenerNumerosDeCadena] 
 (
