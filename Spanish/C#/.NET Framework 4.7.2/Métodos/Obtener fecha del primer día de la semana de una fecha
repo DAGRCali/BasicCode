@@ -1,0 +1,8 @@
+/// <summary>
+/// Indica la fecha del primer día de la semana de la fecha dada según el día de la semana que se debe tomar como el inicial. Generalmente se toma el domingo o el lunes. Por ejemplo, si la fecha es 10 de septiembre de 2023 y se indica que se tome el miércoles como primer día de la semana, devolverá la fecha miércoles 6 de septiembre de 2023.
+/// </summary>
+public static DateTime ObtenerFechaDeInicioDeSemana(this DateTime dt, DayOfWeek primerDiaDeLaSemana)
+{
+    int diff = (7 + (dt.DayOfWeek - primerDiaDeLaSemana)) % 7;
+    return dt.AddDays(-1 * diff).Date;
+}
