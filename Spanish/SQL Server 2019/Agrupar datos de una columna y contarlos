@@ -1,5 +1,4 @@
 -- =============================================
--- Autor:	Daniel Alejandro Gutierrez Ruiz.
 -- Descripcion:	Agrupar los datos almacenados de una columna de una tabla y ordenarlos de manera descendente segun el numero de veces que se repite.
 -- =============================================
 
