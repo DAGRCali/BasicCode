@@ -17,7 +17,8 @@ FETCH NEXT FROM @cursor_dev INTO @id, @nombre, @fecha
 
 WHILE @@FETCH_STATUS = 0
 BEGIN
-  
+	--En este punto, en las variables @id, @nombre y @fecha se encuentran almacenados el id, el nombre y la fecha del pedido que se esta revisando en esta iteracion, por lo que ya se puede acceder a tales datos, aunque se entiende que la modificacion del valor de estas variables no altera en nada los valores almacenados dentro de la tabla 'Pedidos'.
+
 	FETCH NEXT FROM @cursor_dev INTO @id, @nombre, @fecha
 END
 
