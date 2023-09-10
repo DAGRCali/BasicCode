@@ -1,26 +1,26 @@
 DECLARE 
-		@id BIGINT,
-		@nombre NVARCHAR(MAX),
-		@fecha DATETIME
+	@id BIGINT,
+	@nombre NVARCHAR(MAX),
+	@fecha DATETIME
 
-	DECLARE @cursor_dev CURSOR
+DECLARE @cursor_dev CURSOR
 
-	SET @cursor_dev = CURSOR FOR
-		SELECT
-			idPed,
-			nomProv,
-			fecGen
-			FROM @pedidos
+SET @cursor_dev = CURSOR FOR
+	SELECT
+		idPed,
+		nomProv,
+		fecGen
+		FROM @pedidos
 
-	OPEN @cursor_dev
-	FETCH NEXT FROM @cursor_dev INTO @id, @nombre, @fecha
+OPEN @cursor_dev
+FETCH NEXT FROM @cursor_dev INTO @id, @nombre, @fecha
 
-	WHILE @@FETCH_STATUS = 0
-	BEGIN
+WHILE @@FETCH_STATUS = 0
+BEGIN
   
-		FETCH NEXT FROM @cursor_dev INTO @id, @nombre, @fecha
-	END
+	FETCH NEXT FROM @cursor_dev INTO @id, @nombre, @fecha
+END
 
-	CLOSE @cursor_dev
+CLOSE @cursor_dev
 
-	DEALLOCATE @cursor_dev
+DEALLOCATE @cursor_dev
