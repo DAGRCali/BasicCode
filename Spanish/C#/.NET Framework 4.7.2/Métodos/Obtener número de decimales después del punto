@@ -1,0 +1,10 @@
+public static int ObtenerNumeroDeDecimalesDespuesDelPunto(string numero)
+{
+    numero = numero.Trim();
+    int indiceDePunto = numero.IndexOf(".");
+
+    if (indiceDePunto == -1)
+        return 0;
+    else
+        return numero.Substring(indiceDePunto + 1, numero.Length - indiceDePunto - 1).Length;
+}
