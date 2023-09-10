@@ -1,0 +1,25 @@
+/// <summary>
+/// Reemplaza los caracteres no permitidos por un espacio en blanco y devuelve el resultado en una nueva cadena.
+/// </summary>
+private string ObtenerNombreParaArchivoSinCaracteresNoPermitidos(string cadena)
+{
+  List<string> caracteresNoPermitidos = new List<string>()
+  {
+    "<",
+    ">",
+    ":",
+    "\",
+    "/",
+    "|",
+    "?",
+    "*"
+  }
+;
+
+  for (int i = 0; i < caracteresNoPermitidos.Count; i++)
+  {
+    cadena = cadena.Replace(caracteresNoPermitidos[i], " ");
+  }
+  
+  return cadena;
+}
