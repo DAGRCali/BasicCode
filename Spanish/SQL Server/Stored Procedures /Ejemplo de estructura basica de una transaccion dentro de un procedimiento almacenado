@@ -1,0 +1,43 @@
+-- =============================================
+-- Autor:		Daniel Alejandro Gutierrez Ruiz.
+-- Descripcion:	Ejemplo de estructura basica de una transaccion dentro de un procedimiento almacenado.
+-- =============================================
+
+CREATE PROCEDURE NombreDelProcedimientoAlmacenado 
+	@usarTransaccion BIT = 1 --Este parametro da la opcion de hacer que el procedimiento almacenado se ejecute dentro de una transaccion o no. Aunque por lo general, es mejor que si se ejecute dentro de una transaccion, hay ocasiones en que no se puede. Por ejemplo, cuando un procedimiento almacenado ejecutado dentro de una transaccion manda a llamar a otro procedimiento almacenado que se ejecuta tambien dentro de otra transaccion. No se puede ejecutar una transaccion dentro de otra, entonces lo que se hace es que al segundo procedimiento almacenado, se le indica que no se ejecute dentro de una transaccion, de esa forma la primera transaccion se encargara de ejecutar tanto el primero como el segundo procedimiento almacenado dentro de si mismo.
+AS
+BEGIN
+   --Se obtiene un nombre unico para la transaccion
+  DECLARE @tran NVARCHAR(MAX) = CONCAT(1, GETDATE())
+  
+  BEGIN TRY
+  --Se intenta ejecutar la transaccion  
+
+    IF @usarTransaccion = 1
+    --El programador decidio que se ejecute este procedimiento dentro de una transaccion, entonces se inicia la transaccion
+      BEGIN TRANSACTION @tran
+    
+    //El codigo del procedimiento almacenado va aqui
+
+    --Devuelve un estado que indica que el procedimiento almacenado se ejecuto correctamente
+    SELECT 1, 'Procedimiento almacenado ejecutado correctamente.'	
+    
+    IF @usarTransaccion = 1
+      COMMIT TRAN @tran
+  
+  END TRY
+  
+  BEGIN CATCH
+  --Algo salio mal
+
+    IF @usarTransaccion = 1 AND (@@TRANCOUNT) > 0
+    --Si el programador eligio que se ejecute este procedimiento dentro de una transaccion y si se inicio una transaccion, entonces revierte los cambios
+    BEGIN
+      ROLLBACK TRANSACTION @tran
+    END
+
+    --Devuleve el numero y el mensaje del error
+    SELECT ERROR_NUMBER(), ERROR_MESSAGE()
+
+  END CATCH
+END
