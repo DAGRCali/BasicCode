@@ -6,9 +6,9 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 -- =============================================
--- Autor:		    Daniel Alejandro Gutierrez Ruiz.
+-- Autor:	Daniel Alejandro Gutierrez Ruiz.
 -- Descripcion: Obtiene el valor menos el porcentaje especificado.
--- Regresa:		  El resultado en decimal(38,19).
+-- Regresa:	El resultado en decimal(38,19).
 -- =============================================
 ALTER FUNCTION [dbo].[FuncionObtenerCantidadMenosPorcentaje] 
 (
