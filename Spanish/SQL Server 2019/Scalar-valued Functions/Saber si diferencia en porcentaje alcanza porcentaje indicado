@@ -8,7 +8,7 @@ GO
 -- =============================================
 -- Autor:	Daniel Alejandro Gutierrez Ruiz.
 -- Descripcion:	Indica si la diferencia en porcentaje entre dos valores es igual o mayor a la diferencia en porcentaje indicada.
--- Regresa:	Un booleano
+-- Regresa:	Un booleano.
 -- =============================================
 ALTER FUNCTION [dbo].[DiferenciaEnPorcentajeAlcanzaPorcentajeIndicado] 
 (
