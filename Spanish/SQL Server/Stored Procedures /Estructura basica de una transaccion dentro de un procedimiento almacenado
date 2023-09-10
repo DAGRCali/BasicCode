@@ -1,6 +1,6 @@
 -- =============================================
 -- Autor:	Daniel Alejandro Gutierrez Ruiz.
--- Descripcion:	Ejemplo de estructura basica de una transaccion dentro de un procedimiento almacenado.
+-- Descripcion:	structura basica de una transaccion dentro de un procedimiento almacenado.
 -- =============================================
 
 CREATE PROCEDURE NombreDelProcedimientoAlmacenado 
