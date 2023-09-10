@@ -1,0 +1,30 @@
+USE [nombreDeTuBaseDeDatos]
+GO
+/****** Object:  UserDefinedFunction [dbo].[DiferenciaEnPorcentajeAlcanzaPorcentajeIndicado]    Script Date: 09/09/2023 09:44:21 p. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Autor:		    Daniel Alejandro Gutierrez Ruiz.
+-- Descripcion:	Indica si la diferencia en porcentaje entre dos valores es igual o mayor a la diferencia en porcentaje indicada.
+-- Regresa:		  Un booleano
+-- =============================================
+ALTER FUNCTION [dbo].[DiferenciaEnPorcentajeAlcanzaPorcentajeIndicado] 
+(
+	@numero1 DECIMAL(38, 19),
+	@numero2 DECIMAL(38, 19),
+	@porcentajeIndicado DECIMAL(38, 19)
+)
+RETURNS BIT
+AS
+BEGIN
+	DECLARE @alcanza BIT
+	
+	IF ABS(100 - CASE WHEN @numero1 > 0 THEN (@numero2 * 100) / @numero1 ELSE 100 END) >= @porcentajeIndicado
+		SET @alcanza = 1
+	ELSE
+		SET @alcanza = 0
+
+	RETURN @alcanza
+END
