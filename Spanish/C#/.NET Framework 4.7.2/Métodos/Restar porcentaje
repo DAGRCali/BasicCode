@@ -4,17 +4,17 @@
 public static decimal RestarPorcentaje(decimal valor, decimal porcentaje, bool porcentajeEstaDivididoEntre100, bool dividirEntreUnoPuntoYPorcentaje = false)
 {
   if (porcentajeEstaDivididoEntre100)
-  --Por ejemplo, si se desea restar 20%, puede que el valor del porcentaje sea 0.20. En este caso, multiplicamos por 100. 
+  //Por ejemplo, si se desea restar 20%, puede que el valor del porcentaje sea 0.20. En este caso, multiplicamos por 100. 
     porcentaje *= 100;
 
   if(dividirEntreUnoPuntoYPorcentaje)
-  --Hay ocasiones que la resta se hace para volver a un valor inicial. Por ejemplo, 800 + 15% = 920. Si se desea restar ese porcentaje para volver al valor inicial, entonces hacemos lo siguiente: 920 / 1.15 = 800. Este cálculo es útil cuando se desea ver el precio de un producto antes de impuestos, por ejemplo.
+  //Hay ocasiones que la resta se hace para volver a un valor inicial. Por ejemplo, 800 + 15% = 920. Si se desea restar ese porcentaje para volver al valor inicial, entonces hacemos lo siguiente: 920 / 1.15 = 800. Este cálculo es útil cuando se desea ver el precio de un producto antes de impuestos, por ejemplo.
   {
     porcentaje /= 100;
 
     return valor / (1 + porcentaje);
   }
   else
-  --Se hace una resta común. Por ejemplo, 920 - 15% = 782.
+  //Se hace una resta común. Por ejemplo, 920 - 15% = 782.
     return valor - (valor * porcentaje / 100);
 }
