@@ -1,0 +1,15 @@
+-- =============================================
+-- Description: Group the data stored in a column in a table and order them in a descending way according to the number of times it is repeated.
+-- =============================================
+
+SELECT 
+	IDProveedor, 
+	COUNT(*) occurrences
+FROM
+	Producto_Proveedor
+GROUP BY
+	IDProveedor
+HAVING 
+	COUNT(*) > 1
+ORDER BY
+	occurrences DESC
