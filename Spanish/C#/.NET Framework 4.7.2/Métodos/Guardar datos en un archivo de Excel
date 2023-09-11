@@ -1,0 +1,138 @@
+/// <summary>
+/// Crea un archivo de Excel en base a un arreglo bidimensional o un control de tipo DataGridView.
+/// </summary>
+/// <remarks>
+/// Para poder usar este método se necesita instalar el paquete NuGet "ClosedXML.Signed". Si se está usando Visual Studio Community 2022, lo podrás hacer de la siguiente manera: Proyecto > Administrar paquetes NuGet > ...Busca el paquete con su nombre e instalalo...
+/// </remarks>
+/// <returns>Un booleano que indica si fue posible crear el archivo o no.</returns>
+
+using ClosedXML.Excel;
+
+public bool CrearArchivoDeExcel(string rutaYNombre, String[,] datosEnMatriz = null, DataGridView datosEnDGV = null, int[] columnasMasAnchas = null, List<int> columnasVisibles = null, List<string> textosEncabezados = null)
+{
+    try
+    //Intenta crear el archivo
+    {
+        //Crea un libro
+        XLWorkbook wbook = new XLWorkbook();
+
+        //Le agrega una hoja
+        IXLWorksheet ws = wbook.Worksheets.Add("Hoja 1");
+
+        int i, j, k, columnasAgregadas = 0, incremento = textosEncabezados == null ? 0 : 1;
+        bool seDebeExpandirColumna = false,
+            seDebeMostrarColumna = true;
+
+        if (datosEnMatriz != null)
+        //Los datos están en una matriz bidimensional de tipo string
+        {
+            if (textosEncabezados != null)
+            //Hay encabezados especificados para cada columna
+            {
+                for (i = 0; i < textosEncabezados.Count; i++)
+                {
+                    ws.Cell(1, i + 1).Value = textosEncabezados[i];
+                }
+            }
+
+            //Sino hay encabezados especificados, la primer fila de datos será el encabezado
+
+            for (i = 0; i < datosEnMatriz.GetLength(0); i++)
+            {
+                for (j = 0; j < datosEnMatriz.GetLength(1); j++)
+                {
+                    ws.Cell(i + 1 + incremento, j + 1).Value = datosEnMatriz[i, j];
+                }
+            }
+
+            if (columnasMasAnchas != null)
+            //Hay columnas específicas que se desea que sean más anchas
+            {
+                for (i = 0; i < datosEnMatriz.GetLength(1); i++)
+                {
+                    for (j = 0; j < columnasMasAnchas.Length; j++)
+                    {
+                        if (i == columnasMasAnchas[j])
+                        {
+                            ws.Column(i + 1).Width = 25;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            //Le da formato de texto a todas las celdas de la hoja, para asegurarnos que los datos guardados en cada celda serán respetados. 
+            ws.CellsUsed().SetDataType(XLDataType.Text);
+        }
+
+        if (datosEnDGV != null)
+        //Los datos están en un control de tipo DataGridView
+        {
+            for (j = 0; j < datosEnDGV.Columns.Count; j++)
+            //Recorre cada columna
+            {
+                if (columnasVisibles == null)
+                    //No se especificaron columnas visibles, entonces todas serán visibles
+                    seDebeMostrarColumna = true;
+                else
+                    //Hay columnas visibles especificadas, la columna actual será visible solamente si está en la lista
+                    seDebeMostrarColumna = columnasVisibles.Exists(item => item == j);
+
+                if (seDebeMostrarColumna)
+                //Solamente trabaja en la columna si es visible
+                {
+                    for (i = 0; i < datosEnDGV.Rows.Count; i++)
+                    //Llena los datos de la columna actual, fila por fila
+                    {
+                        ws.Cell(i + 2, columnasAgregadas + 1).Value = datosEnDGV.Rows[i].Cells[j].Value + "";
+                    }
+
+                    //Le da formato de texto a todas las celdas de la columna actual, para asegurarnos que los datos guardados en cada celda serán respetados.
+                    ws.Column(columnasAgregadas + 1).CellsUsed().SetDataType(XLDataType.Text);
+
+                    if (columnasMasAnchas == null)
+                        //No hay columnas mas anchas especificadas, todas tendrán el mismo anchor
+                        ws.Column(columnasAgregadas + 1).Width = 10;
+                    else
+                    //Si la columna actual está en la lista de columnas más anchas, se le da más anchor
+                    {
+                        for (k = 0; k < columnasMasAnchas.Length; k++)
+                        {
+                            if (j == columnasMasAnchas[k])
+                            {
+                                seDebeExpandirColumna = true;
+                                break;
+                            }
+                        }
+
+                        if (seDebeExpandirColumna)
+                        {
+                            ws.Column(columnasAgregadas + 1).Width = 25;
+
+                            seDebeExpandirColumna = false;
+                        }
+                    }
+
+                    //Se guarda el encabezado de la columna actual obtenido del encabezado de la columna actual del DataGridView
+                    ws.Cell(1, columnasAgregadas + 1).Value = datosEnDGV.Columns[j].HeaderText;
+
+                    //Se aumenta el contador para saber en que columna vamos
+                    columnasAgregadas++;
+                }
+            }
+        }
+
+        //Quita caracteres no permitidos en la ruta y el nombre del archivo
+        rutaYNombre = QuitarCaracteresNoPermitidos(rutaYNombre);
+
+        //Guarda el archivo
+        wbook.SaveAs(rutaYNombre + ".xlsx");
+
+        return true;
+    }
+    catch (Exception ex)
+    //No se pudo generar el archivo
+    {
+        return false;
+    }
+}
