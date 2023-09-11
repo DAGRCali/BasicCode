@@ -1,0 +1,89 @@
+USE [databaseName]
+GO
+/****** Object:  UserDefinedFunction [dbo].[GetNumbersWithinString]    Script Date: 16/02/2023 06:31:51 p. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Autor:	Daniel Alejandro Gutierrez Ruiz.
+-- Description:	Gets the numbers contained in a string and returns them in a list of decimals.
+-- Returns:	List of decimals found.
+-- =============================================
+CREATE FUNCTION [dbo].[GetNumbersWithinString] 
+(
+	@string NVARCHAR(MAX),
+	@ifStringIsEmptyGetAZero BIT = 0
+)
+RETURNS @numbersFound table(number decimal(38,19))
+AS
+BEGIN
+	IF @ifStringIsEmptyGetAZero = 1 AND TRIM(@string) = ''
+		SET @string = '0'
+
+	IF @string LIKE '%[0-9]%'
+	--Contains at least one number
+	BEGIN
+		set @string = REPLACE(@string, ' ','')
+		DECLARE @digitsCurrentNumber TABLE(orden int, digitos CHAR)
+		DECLARE @counter INT = 0,
+			@numberOfCharacters INT = LEN(@string) + 1,
+			@currentCharacter CHAR,
+			@readingNumber BIT = 0,
+			@isNegative BIT = 0
+
+		WHILE @counter < @numberOfCharacters
+		BEGIN
+			IF @counter = @numberOfCharacters - 1
+				SET @currentCharacter = ' '
+			ELSE
+				SET @currentCharacter = SUBSTRING(@string, @counter + 1, 1)
+		
+			IF @currentCharacter LIKE '[0-9]' OR (@readingNumber = 1 AND @currentCharacter = ',') OR @currentCharacter = '.' OR (@currentCharacter = '-' AND @readingNumber = 0 AND SUBSTRING(@string, @counter + 2, 1) LIKE '[0-9]')
+			BEGIN
+				SET @readingNumber = 1
+
+				IF @currentCharacter = '-' OR (@counter > 0 AND SUBSTRING(@string, @counter, 1) = '-')
+					SET @isNegative = 1
+
+				IF @currentCharacter != ',' AND @currentCharacter != '-'
+					INSERT INTO @digitsCurrentNumber(orden, digitos) VALUES(ISNULL((SELECT MAX(orden) + 1 FROM @digitsCurrentNumber), 0), @currentCharacter)
+			END
+			ELSE
+			IF @readingNumber = 1
+			BEGIN
+				SET @readingNumber = 0
+				
+				IF EXISTS(SELECT * FROM @digitsCurrentNumber)
+				BEGIN
+					IF NOT((SELECT top 1 digitos FROM @digitsCurrentNumber ORDER BY orden ASC) = '.' AND (SELECT COUNT(*) FROM @digitsCurrentNumber) = 1)
+					BEGIN
+						IF (SELECT top 1 digitos FROM @digitsCurrentNumber ORDER BY orden ASC) = '.'
+							INSERT INTO @digitsCurrentNumber(orden, digitos) values(ISNULL((SELECT MIN(orden) - 1 FROM @digitsCurrentNumber), 0), '0')
+						ELSE
+							IF ((SELECT top 1 digitos FROM @digitsCurrentNumber order by orden DESC) = '.')
+								INSERT INTO @digitsCurrentNumber(orden, digitos) VALUES(ISNULL((SELECT MAX(orden) + 1 FROM @digitsCurrentNumber), 0), '0')
+							
+							--We verify that all the digits captured in @digitsCurrentNumber are valid
+							IF NOT EXISTS(SELECT * FROM @digitsCurrentNumber WHERE digitos NOT LIKE '[0-9]' AND digitos NOT LIKE '.') AND (SELECT COUNT(*) FROM @digitsCurrentNumber WHERE digitos = '.') <= 1
+							BEGIN
+								INSERT INTO @numbersFound(number) VALUES(
+								CAST(
+								CONCAT(CASE WHEN @isNegative = 1 THEN '-' ELSE '' END,		(SELECT STRING_AGG(digitos, '') FROM @digitsCurrentNumber)) AS DECIMAL(38, 19)
+									)
+								)
+							END
+					END
+					
+					DELETE FROM @digitsCurrentNumber
+				END
+				
+				SET @isNegative = 0
+			END
+
+			SET @counter += 1
+		END
+	END
+	
+	RETURN
+END
