@@ -1,7 +1,7 @@
 /// <summary>
 /// Reemplaza los caracteres no permitidos por un espacio en blanco y devuelve el resultado en una nueva cadena.
 /// </summary>
-private string ObtenerNombreParaArchivoSinCaracteresNoPermitidos(string cadena)
+private string ObtenerNombreParaArchivoSinCaracteresNoPermitidos(string rutaYNombre)
 {
   List<string> caracteresNoPermitidos = new List<string>()
   {
@@ -16,10 +16,20 @@ private string ObtenerNombreParaArchivoSinCaracteresNoPermitidos(string cadena)
   }
 ;
 
+  //Esto es necesario en Windows, cuando el parámetro recibido es una ruta en vez de solo el nombre. Por ejemplo "C:\Users", solamente esos dos puntos en la posición 1 de la cadena son permitidos, mientras que en el nombre del archivo no lo son.
+  bool volverAPonerPrimerosDosPuntos = rutaYNombre.ElementAt(1).Equals(':');
+
   for (int i = 0; i < caracteresNoPermitidos.Count; i++)
   {
-    cadena = cadena.Replace(caracteresNoPermitidos[i], " ");
+    rutaYNombre = rutaYNombre.Replace(caracteresNoPermitidos[i], " ");
   }
-  
-  return cadena;
+            
+  if (volverAPonerPrimerosDosPuntos)
+  {
+    StringBuilder sb = new StringBuilder(rutaYNombre);
+    sb[1] = ':';
+    rutaYNombre = sb.ToString();
+  }
+
+  return rutaYNombre;
 }
