@@ -1,0 +1,40 @@
+USE [databaseName]
+GO
+/****** Object:  UserDefinedFunction [dbo].[ObtainAmountLessPercentage]    Script Date: 09/09/2023 10:06:51 p. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Descripcion: Obtains the value less the specified percentage.
+-- Regresa:	The result in decimal(38,19).
+-- =============================================
+ALTER FUNCTION [dbo].[ObtainAmountLessPercentage] 
+(
+	@value DECIMAL(38, 19),
+	@percentage DECIMAL(38, 19),
+	@percentageIsDividedBy100 BIT,
+  @divideByOnePointAndPercent BIT = 0
+)
+RETURNS DECIMAL(38, 19)
+AS
+BEGIN
+	DECLARE @result DECIMAL(38, 19)
+	
+	IF @percentageIsDividedBy100 = 1
+  --For example, if you want to subtract 20%, the percentage value may be 0.20. In this case, we multiply by 100.
+        SET @percentage *= 100;
+
+    IF @divideByOnePointAndPercent = 1
+    --There are times when the subtraction is done to return to an initial value. For example, 800 + 15% = 920. If you want to subtract that percentage to return to the initial value, then we do the following: 920 / 1.15 = 800. This calculation is useful when you want to see the price of a product before taxes, for example.
+    BEGIN
+        SET @percentage /= 100;
+
+        SET @result = @value / (1 + @percentage);
+    END
+    --A common subtraction is done. For example, 920 - 15% = 782.
+    ELSE
+        SET @result = @value - (@value * @percentage / 100);
+
+	RETURN @result
+END
