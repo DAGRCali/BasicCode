@@ -1,0 +1,42 @@
+-- =============================================
+-- Description: Basic structure of a transaction
+-- =============================================
+
+CREATE PROCEDURE StoredProcedureName 
+	@useTransaction BIT = 1 --This parameter gives the option to have the stored procedure run within a transaction or not. Although it is generally better to execute it within a transaction, there are times when it cannot be done. For example, when a stored procedure executed within a transaction calls another stored procedure that is also executed within another transaction. You cannot execute a transaction within another, so what is done is that the second stored procedure is told not to be executed within a transaction, in this way the first transaction will be in charge of executing both, the first and the second stored procedure within itself.
+AS
+BEGIN
+   --Get a unique name for the transaction
+  DECLARE @tran NVARCHAR(MAX) = CONCAT(1, GETDATE())
+  
+  BEGIN TRY
+  --An attempt is made to execute the transaction 
+
+    IF @useTransaction = 1
+    --The programmer decided to execute this procedure within a transaction, so the transaction is started
+      BEGIN TRANSACTION @tran
+    
+    //Stored procedure code goes here
+
+    --Returns a status indicating that the stored procedure was executed successfully.
+    SELECT 1, 'Stored procedure executed successfully.'	
+    
+    IF @useTransaction = 1
+      COMMIT TRAN @tran
+  
+  END TRY
+  
+  BEGIN CATCH
+  --Something went wrong
+
+    IF @useTransaction = 1 AND (@@TRANCOUNT) > 0
+    --If the programmer chose to run this procedure within a transaction and the transaction was started, then revert the changes.
+    BEGIN
+      ROLLBACK TRANSACTION @tran
+    END
+
+    --Returns the error number and message
+    SELECT ERROR_NUMBER(), ERROR_MESSAGE()
+
+  END CATCH
+END
