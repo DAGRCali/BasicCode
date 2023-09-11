@@ -1,0 +1,24 @@
+/// <summary>
+/// Esta es una prueba en english
+/// </summary>
+/// <remarks>
+/// Este método puede ser usado más de una vez para un mismo objeto RichTextBox. Esto permite que un objeto RichTextBox tenga diferentes textos con diferentes colores y fuentes. El texto solo se mostrará de la manera deseada si todas las veces que se añade texto al objeto RichTextBox se hace con éste método o con el método 'AppendText' de la clase RichTextBox.
+/// </remarks>
+
+public static void AgregarTextoConFormato(RichTextBox richTextBox, string texto, Color color, Font fuente)
+{
+  Font fuenteOriginal = (Font)richTextBox.Font.Clone();
+
+  richTextBox.SelectionStart = richTextBox.TextLength;
+  richTextBox.SelectionLength = 0;
+  richTextBox.SelectionFont = fuente;
+  richTextBox.SelectionColor = color;
+  richTextBox.AppendText(texto);
+  
+  //Devuelve la fuente y el color original al objeto RichTextBox, por si después se le vuelve a agregar texto, este se agregue con el formato definido en el objeto RichTextBox antes de ejecutar este método.
+  richTextBox.SelectionFont = fuenteOriginal;
+  richTextBox.SelectionColor = richTextBox.ForeColor;
+
+  //Basado en respuesta de Jon Hanna
+  //https://stackoverflow.com/questions/41825940/cs1106-extension-method-must-be-defined-in-a-non-generic-static-class
+}
