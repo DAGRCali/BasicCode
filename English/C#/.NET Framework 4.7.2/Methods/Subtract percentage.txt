@@ -1,0 +1,20 @@
+/// <summary>
+/// Obtains the value less the specified percentage
+/// </summary>
+public static decimal Restarpercentage(decimal value, decimal percentage, bool percentageIsDividedBy100, bool divideBetweenOnePointAndPercentage = false)
+{
+  if (percentageIsDividedBy100)
+  //For example, if you want to subtract 20%, the value of the percantage may be 0.20. In this case, we multiply by 100.
+    percentage *= 100;
+
+  if(divideBetweenOnePointAndPercentage)
+  //There are occasions that the subtraction is done to return to an initial value. For example, 800 + 15% = 920. If you want to subtract that percantage to return to the initial value, then we do the following: 920 / 1.15 = 800. This calculation is useful when you want to see the price of a product before taxes, for example.
+  {
+    percentage /= 100;
+
+    return value / (1 + percentage);
+  }
+  else
+  //A common subtraction is made. For example, 920 - 15% = 782.
+    return value - (value * percentage / 100);
+}

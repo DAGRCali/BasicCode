@@ -1,0 +1,174 @@
+/// <summary>
+/// Creates an Excel file based on a two-dimensional array or a DataGridView type control.
+/// </summary>
+/// <remarks>
+/// In order to use this method you need to install the "ClosedXML.Signed" NuGet package. If you are using Visual Studio Community 2022, you can do it as follows: Project > Manage NuGet Packages > ...Look for the package with its name and install it...
+/// </remarks>
+/// <returns>A boolean indicating whether the file could be created or not.</returns>
+
+using ClosedXML.Excel;
+
+public bool CreateExcelFile(string routeAndName, String[,] dataInArray = null, DataGridView dataInDGV = null, int[] widerColumns = null, List<int> visibleColumns = null, List<string> headerTexts = null)
+{
+    try
+    //Try to create the file
+    {
+        //Create a book
+        XLWorkbook wbook = new XLWorkbook();
+
+        //Add a sheet
+        IXLWorksheet ws = wbook.Worksheets.Add("Hoja 1");
+
+        int i, j, k, addedColumns = 0, increase = headerTexts == null ? 0 : 1;
+        bool mustExpandColumn = false,
+            mustShowColumn = true;
+
+        if (dataInArray != null)
+        //The data is in a two-dimensional array of type string
+        {
+            if (headerTexts != null)
+            //There are headers specified for each column
+            {
+                for (i = 0; i < headerTexts.Count; i++)
+                {
+                    ws.Cell(1, i + 1).Value = headerTexts[i];
+                }
+            }
+
+            //If there are no headers specified, the first row of data will be the header
+
+            for (i = 0; i < dataInArray.GetLength(0); i++)
+            {
+                for (j = 0; j < dataInArray.GetLength(1); j++)
+                {
+                    ws.Cell(i + 1 + increase, j + 1).Value = dataInArray[i, j];
+                }
+            }
+
+            if (widerColumns != null)
+            //There are specific columns that you want to be wider
+            {
+                for (i = 0; i < dataInArray.GetLength(1); i++)
+                {
+                    for (j = 0; j < widerColumns.Length; j++)
+                    {
+                        if (i == widerColumns[j])
+                        {
+                            ws.Column(i + 1).Width = 25;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            //It formats all the cells of the sheet as text, to ensure that the data saved in each cell will be respected.
+            ws.CellsUsed().SetDataType(XLDataType.Text);
+        }
+
+        if (dataInDGV != null)
+        //The data is in a control of type DataGridView
+        {
+            for (j = 0; j < dataInDGV.Columns.Count; j++)
+            //Go through each column
+            {
+                if (visibleColumns == null)
+                    //No visible columns were specified, so all will be visible
+                    mustShowColumn = true;
+                else
+                    //There are visible columns specified, the current column will be visible only if it is in the list
+                    mustShowColumn = visibleColumns.Exists(item => item == j);
+
+                if (mustShowColumn)
+                //Only works on the column if it is visible
+                {
+                    for (i = 0; i < dataInDGV.Rows.Count; i++)
+                    //Fills the data in the current column, row by row
+                    {
+                        ws.Cell(i + 2, addedColumns + 1).Value = dataInDGV.Rows[i].Cells[j].Value + "";
+                    }
+
+                    //Formats all cells in the current column as text, to ensure that the data saved in each cell will be respected.
+                    ws.Column(addedColumns + 1).CellsUsed().SetDataType(XLDataType.Text);
+
+                    if (widerColumns == null)
+                        //There are no wider columns specified, all will have the same anchor
+                        ws.Column(addedColumns + 1).Width = 10;
+                    else
+                    //If the current column is in the list of widest columns, it will have more anchor
+                    {
+                        for (k = 0; k < widerColumns.Length; k++)
+                        {
+                            if (j == widerColumns[k])
+                            {
+                                mustExpandColumn = true;
+                                break;
+                            }
+                        }
+
+                        if (mustExpandColumn)
+                        {
+                            ws.Column(addedColumns + 1).Width = 25;
+
+                            mustExpandColumn = false;
+                        }
+                    }
+
+                    //Saves the current column header obtained from the current column header of the DataGridView
+                    ws.Cell(1, addedColumns + 1).Value = dataInDGV.Columns[j].HeaderText;
+
+                    //The counter is increased to know which column we are in
+                    addedColumns++;
+                }
+            }
+        }
+
+        //Remove illegal characters from path and file name
+        routeAndName = GetNameForFileWithoutCharactersNotAllowed(routeAndName);
+
+        //Save the file
+        wbook.SaveAs(routeAndName + ".xlsx");
+
+        return true;
+    }
+    catch (Exception ex)
+    //Could not generate file
+    {
+        return false;
+    }
+}
+
+/// <summary>
+/// Replaces illegal characters with whitespace and returns the result as a new string.
+/// </summary>
+private string GetNameForFileWithoutCharactersNotAllowed(string routeAndName)
+{
+  List<string> charactersNotAllowed = new List<string>()
+  {
+    "<",
+    ">",
+    ":",
+    "\",
+    "/",
+    "|",
+    "?",
+    "*"
+  }
+;
+
+  //This is necessary on Windows, when the parameter received is a path instead of just the name. For example "C:\Users", only those colons in position 1 of the string are allowed, while those in the file name are not.
+  bool putFirstTwoPointsAgain = routeAndName.ElementAt(1).Equals(':');
+
+  for (int i = 0; i < charactersNotAllowed.Count; i++)
+  {
+    routeAndName = routeAndName.Replace(charactersNotAllowed[i], " ");
+  }
+            
+  if (putFirstTwoPointsAgain)
+  {
+    StringBuilder sb = new StringBuilder(routeAndName);
+    sb[1] = ':';
+    routeAndName = sb.ToString();
+  }
+
+  return routeAndName;
+}

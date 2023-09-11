@@ -1,0 +1,72 @@
+/// <summary>
+/// Gets the numbers contained in a string and returns them in a list of decimals.
+/// </summary>
+/// <returns>List of decimals found.</returns>
+
+public static List<decimal> GetStringNumbers(string text, bool ifStringIsEmptyReplaceByZero = false)
+{
+    if (ifStringIsEmptyReplaceByZero && text.Trim().Equals(""))
+        text = "0";
+    
+    List<decimal> numbersFound = new List<decimal>();
+
+    if (text.Any(char.IsDigit))
+    {
+        text = text.Replace(" ", "");
+        List<char> digitsOfCurrentNumber = new List<char>();
+        int counter = 0,
+        numberOfCharacters = text.Length + 1;
+        char currentCharacter;
+        bool readingNumber = false,
+            isNegative = false;
+
+        while (counter < numberOfCharacters)
+        {
+            if (counter == numberOfCharacters - 1)
+                currentCharacter = ' ';
+            else
+                currentCharacter = text[counter];
+
+            if (int.TryParse(currentCharacter + "", out _) || (readingNumber && currentCharacter.Equals(',')) || currentCharacter.Equals('.') || (currentCharacter.Equals('-') && readingNumber == false && int.TryParse(text[counter + 1] + "", out _)))
+            {
+                readingNumber = true;
+
+                if (currentCharacter.Equals('-') || (counter > 0 && text[counter - 1].Equals('-')))
+                    isNegative = true;
+
+                if (!currentCharacter.Equals(',') && !currentCharacter.Equals('-'))
+                    digitsOfCurrentNumber.Add(currentCharacter);
+            }
+            else
+            if (readingNumber)
+            {
+                readingNumber = false;
+
+                if (digitsOfCurrentNumber.Count > 0)
+                {
+                    if (!(digitsOfCurrentNumber[0].Equals('.') && digitsOfCurrentNumber.Count == 1))
+                    {
+                        if (digitsOfCurrentNumber[0].Equals('.'))
+                            digitsOfCurrentNumber.Insert(0, '0');
+                        else
+                        if (digitsOfCurrentNumber[digitsOfCurrentNumber.Count - 1].Equals('.'))
+                            digitsOfCurrentNumber.Add('0');
+
+                        if (digitsOfCurrentNumber.All(item => int.TryParse(item + "", out _) || item.Equals('.')) && digitsOfCurrentNumber.Count(item => item.Equals('.')) <= 1)
+                        {
+                            numbersFound.Add(decimal.Parse((isNegative ? "-" : "") + String.Join("", digitsOfCurrentNumber.ToArray())));
+                        }
+                    }
+
+                    digitsOfCurrentNumber.Clear();
+                }
+
+                isNegative = false;
+            }
+
+            counter++;
+        }
+    }
+
+    return numbersFound;
+}

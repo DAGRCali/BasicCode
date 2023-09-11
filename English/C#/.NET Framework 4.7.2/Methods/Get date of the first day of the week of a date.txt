@@ -1,0 +1,8 @@
+/// <summary>
+/// Indicates the date of the first day of the week of the given date according to the day of the week that should be taken as the initial one. It is generally taken on Sunday or Monday. For example, if the date is September 10, 2023 and it is indicated to take Wednesday as the first day of the week, it will return the date Wednesday September 6, 2023.
+/// </summary>
+public static DateTime GetWeekStartDate(this DateTime dt, DayOfWeek firstDayOfTheWeek)
+{
+    int diff = (7 + (dt.DayOfWeek - firstDayOfTheWeek)) % 7;
+    return dt.AddDays(-1 * diff).Date;
+}

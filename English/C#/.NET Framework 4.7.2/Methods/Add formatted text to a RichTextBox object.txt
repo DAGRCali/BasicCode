@@ -1,0 +1,24 @@
+/// <summary>
+/// Adds text with the specified color and font to the given RichTextBox.
+/// </summary>
+/// <remarks>
+/// This method can be used more than once for the same RichTextBox object. This allows a RichTextBox object to have different texts with different colors and fonts. The text will only be displayed at the expected way if every time you add text to the RichTextBox object it is done with this method or with the 'AppendText' method of the RichTextBox class.
+/// </remarks>
+
+public static void AddFormattedText(RichTextBox richTextBox, string text, Color color, Font font)
+{
+  Font sourceOriginal = (Font)richTextBox.Font.Clone();
+
+  richTextBox.SelectionStart = richTextBox.TextLength;
+  richTextBox.SelectionLength = 0;
+  richTextBox.SelectionFont = font;
+  richTextBox.SelectionColor = color;
+  richTextBox.AppendText(text);
+  
+  //Returns the original font and color to the RichTextBox object, in case text is added again later, it is added with the formatting defined in the RichTextBox object before executing this method.
+  richTextBox.SelectionFont = sourceOriginal;
+  richTextBox.SelectionColor = richTextBox.ForeColor;
+
+  //Based on Jon Hanna's answer
+  //https://stackoverflow.com/questions/41825940/cs1106-extension-method-must-be-defined-in-a-non-generic-static-class
+}

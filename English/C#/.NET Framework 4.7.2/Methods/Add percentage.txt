@@ -1,0 +1,12 @@
+/// <summary>
+/// Obtains the value plus the specified percentage
+/// </summary>
+
+public static decimal AddPercentage(decimal value, decimal percentage, bool percentageIsDividedBy100)
+{
+  if (!percentageIsDividedBy100)
+  //For example, if you want to add 20% and the value of the percantage effectively is 20, then we divide by 100.
+    percentage /= 100;
+
+    return value * (1 + percentage);
+}

@@ -1,0 +1,14 @@
+/// <summary>
+/// Obtain the number of decimals after the point. For example, if it receives 3,14159, it will return 5.
+/// </summary>
+
+public static int ObtainNumberOfDecimalsAfterPoint(string number)
+{
+    number = number.Trim();
+    int pointIndex = number.IndexOf(".");
+
+    if (pointIndex == -1)
+        return 0;
+    else
+        return number.Substring(pointIndex + 1, number.Length - pointIndex - 1).Length;
+}

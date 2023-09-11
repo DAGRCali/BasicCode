@@ -1,0 +1,40 @@
+/// <summary>
+/// Creates an image with the specified text.
+/// </summary>
+public static Image DrawText(String text, Font font, Color textColor, Color backColor)
+{
+    //First, create a dummy bitmap just to get a graphic object.
+    Image img = new Bitmap(1, 1);
+    Graphics drawing = Graphics.FromImage(img);
+
+    //Measure the chain to see how big the image should be
+    SizeF textSize = drawing.MeasureString(text, font);
+
+    //Release the dummy image and old graphic object
+    img.Dispose();
+    drawing.Dispose();
+
+    //Create a new image of the correct size
+    img = new Bitmap((int)textSize.Width, (int)textSize.Height);
+
+    drawing = Graphics.FromImage(img);
+
+    //Paint the background
+    drawing.Clear(backColor);
+
+    //Create a brush for the text
+    Brush textBrush = new SolidBrush(textColor);
+
+    drawing.DrawString(text, font, textBrush, 0, 0);
+
+    drawing.Save();
+
+    textBrush.Dispose();
+    drawing.Dispose();
+
+    return img;
+
+    //Retrieved on January 2, 2023
+    //https://stackoverflow.com/questions/2070365/how-to-generate-an-image-from-text-on-fly-at-runtime
+    //Alistair Evans Code
+}

@@ -1,0 +1,28 @@
+/// <summary>
+/// Delete files that are that many days old or longer in the directory.
+/// </summary>
+/// <remarks>
+/// If the extension is specified, only those files with that extension will be deleted.
+/// </remarks>
+public static void DeleteOldFiles(String directory, int days, string extension = "")
+{
+  try
+    {
+      if (Directory.Exists(directory))
+        {
+          string[] files = Directory.GetFiles(directory);
+
+          foreach (string file in files)
+          {
+            FileInfo fi = new FileInfo(file);
+
+            if (fi.CreationTime < DateTime.Now.AddDays(-days) && (extension.Equals("") || fi.Extension.Equals(extension)))
+              fi.Delete();
+           }
+         }
+    }
+    catch (Exception ex)
+    {
+       MessageBox.Show("Could not delete a file that is " + days + " days old. This is a minor detail. Contact support.", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+    }
+}
