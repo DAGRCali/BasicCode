@@ -136,3 +136,39 @@ public bool CrearArchivoDeExcel(string rutaYNombre, String[,] datosEnMatriz = nu
         return false;
     }
 }
+
+/// <summary>
+/// Reemplaza los caracteres no permitidos por un espacio en blanco y devuelve el resultado en una nueva cadena.
+/// </summary>
+private string ObtenerNombreParaArchivoSinCaracteresNoPermitidos(string rutaYNombre)
+{
+  List<string> caracteresNoPermitidos = new List<string>()
+  {
+    "<",
+    ">",
+    ":",
+    "\",
+    "/",
+    "|",
+    "?",
+    "*"
+  }
+;
+
+  //Esto es necesario en Windows, cuando el parámetro recibido es una ruta en vez de solo el nombre. Por ejemplo "C:\Users", solamente esos dos puntos en la posición 1 de la cadena son permitidos, mientras que en el nombre del archivo no lo son.
+  bool volverAPonerPrimerosDosPuntos = rutaYNombre.ElementAt(1).Equals(':');
+
+  for (int i = 0; i < caracteresNoPermitidos.Count; i++)
+  {
+    rutaYNombre = rutaYNombre.Replace(caracteresNoPermitidos[i], " ");
+  }
+            
+  if (volverAPonerPrimerosDosPuntos)
+  {
+    StringBuilder sb = new StringBuilder(rutaYNombre);
+    sb[1] = ':';
+    rutaYNombre = sb.ToString();
+  }
+
+  return rutaYNombre;
+}
