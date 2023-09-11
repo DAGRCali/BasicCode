@@ -1,0 +1,31 @@
+-- =============================================
+-- Description:	Basic structure of a cursor.
+-- =============================================
+
+DECLARE 
+	@id BIGINT,
+	@name NVARCHAR(MAX),
+	@date DATETIME
+
+DECLARE @cursor CURSOR
+
+SET @cursor = CURSOR FOR
+	SELECT
+		idPed,
+		nomProv,
+		fecGen
+		FROM @orders
+
+OPEN @cursor
+FETCH NEXT FROM @cursor INTO @id, @name, @date
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+	--At this point, the ID, the name and the date of the current row are stored in the variables @id, @name and @date, so you can already access such data, although it is understood that the modification of the value of these variables do not alter the stored values within the 'Orders' table.
+
+	FETCH NEXT FROM @cursor INTO @id, @name, @date
+END
+
+CLOSE @cursor
+
+DEALLOCATE @cursor
